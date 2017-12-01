@@ -15,6 +15,9 @@ git clone https://github.com/nanobox-quickstarts/nanobox-laravel.git
 
 # cd into the laravel app
 cd nanobox-laravel
+
+# create a .env file
+cp .env.example .env
 ```
 
 ## Run the app
