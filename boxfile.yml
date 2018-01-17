@@ -1,23 +1,15 @@
+### This boxfile.yml is designed to generate a Laravel project when first run.
+### If you have an existing Laravel project and are using this as a template,
+### Remove lines 37 and 38 and uncomment lines 35 and 36 (the npm commands)
+###
 run.config:
-  # install php and associated runtimes
   engine: php
-
-  # php engine configuration (php version, extensions, etc)
   engine.config:
-
-    # sets the php version to 7.0
-    runtime: php-7.0
-
-    # use nginx
+    runtime: php-7.1
     webserver: nginx
-
-    # public directory
     document_root: public
-
-    # enables php extensions
     extensions:
       - pdo
-      - pdo_mysql
       - mbstring
       - tokenizer
       - session
@@ -25,35 +17,59 @@ run.config:
       - dom
       - xml
       - ctype
+      - xmlwriter
+      - pdo_mysql
 
-#
+  # Use node/npm locally for mix
+  # dev_packages:
+  #   - nodejs
+  #   - python-2.7
+  # cache_dirs:
+  #   - node_modules
+  # extra_path_dirs:
+  #   - node_modules/.bin
+  # build_triggers:
+  #   - package.json
+
+  extra_steps: # Load node modules and run mix tasks during your build
+    # - npm install
+    # - npm run dev
+    # Run the quickstart and clean-up afterward
+    - bash quickstart/install.sh && rm -rf quickstart
+
 deploy.config:
+  extra_steps:
+    - mv .env.prod .env
+    # Run mix tasks when deploying
+    # - npm run production
   before_live:
-    web.main:
-      - php artisan migrate --force
-      - mkdir -p storage/framework/{sessions,cache,views}
+    web.site:
+      - mkdir -p storage/{app,framework/{sessions,cache,views},logs,public}
+      # Run db migrations on deploy
+      # - php artisan migrate --force
 
-# add a MySQL database
-data.db:
-  image: nanobox/mysql:5.6
-
-# add a local storage database
-data.storage:
-  image: nanobox/unfs:0.9
-
-# add a web server
-web.main:
-  start: php-server
-
-  # add writable dirs to your web component
+web.site:
+  start:
+    php: start-php
+    nginx: start-nginx
   writable_dirs:
     - bootstrap/cache
-
-  # the path to a logfile you want streamed to the nanobox dashboard
-  log_watch:
-    laravel[error]: /app/storage/logs/laravel.log
-
-  # directories to be stored in the data.storage component
   network_dirs:
     data.storage:
       - storage
+  log_watch:
+    laravel[error]: /app/storage/logs/laravel.log
+
+data.mysql:
+  image: nanobox/mysql:5.7
+
+data.storage:
+  image: nanobox/unfs:0.9
+
+# Inlcude a Postgres database
+# data.postgres:
+#   image: nanobox/postgres:9.6
+
+# Inlcude a Redis service
+# data.redis:
+#   image: nanobox/redis:4.0
