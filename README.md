@@ -17,6 +17,19 @@ git clone https://github.com/nanobox-quickstarts/nanobox-laravel.git
 cd nanobox-laravel
 ```
 
+## Setup Laravel
+
+```bash
+# Drop into the Nanobox console
+nanobox run
+
+# Create environment file for Laravel
+cp .env.example .env
+
+# Generate APP_KEY
+php artisan key:generate
+```
+
 ## Run the app
 
 ```bash
